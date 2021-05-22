@@ -5,10 +5,12 @@ const validateImage = (img) => (/\.(jpg|png|gif)$/i).test(img)
 //Get all elements
 exports.getAllPosts = async (req, res) => {
   try {
-    const query = 'SELECT * FROM blog_db.posts ORDER BY id DESC';
 
-    const response = await conn(query);
-    console.log(response)
+    let query = `SELECT
+      posts.id, posts.title, posts.content, posts.image, posts.date, categories.description AS category
+      FROM posts INNER JOIN categories ON posts.category = categories.id;`
+
+    let response = await conn(query)
 
     res.send({ "response": response });
   }
@@ -83,7 +85,10 @@ exports.getOne = async (req, res) => {
       throw new Error("No id detected");
     }
 
-    const query = 'SELECT * FROM blog_db.posts WHERE id = ?';
+    const query = `SELECT
+      posts.id, posts.title, posts.content, posts.image, posts.date, categories.description AS category
+      FROM posts INNER JOIN categories ON posts.category = categories.id
+    WHERE posts.id = ?`;
     const response = await conn(query, [req.params.id]);
 
     if (response.length > 0) {

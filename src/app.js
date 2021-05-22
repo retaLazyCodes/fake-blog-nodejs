@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 // importing routes
-const routes = require('./routes/posts')
+const postsRoutes = require('./routes/posts')
 
 // initialization
 const app = express()
@@ -13,7 +13,7 @@ app.use(cors())
 app.options('*', cors())
 
 // routes
-app.use(routes)
+app.use(postsRoutes)
 
 
 module.exports = app
