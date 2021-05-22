@@ -5,21 +5,21 @@ Content-Type: application/json
     "title": "Post example",
     "content": "Esto es un nuevo post",
     "image": "https://cdn.pixabay.com/photo/2021/04/27/13/32/birds-6211541_960_720.png",
-    "category": "other"
+    "category": 6
 }
 
 ###
-
+// bad request
 POST http://localhost:8081/api/posts
 Content-Type: application/json
 
 {
     "title": "Post example",
-    "category": "other"
+    "category": 6
 }
 
 ###
-
+// bad request
 POST http://localhost:8081/api/posts
 Content-Type: application/json
 
