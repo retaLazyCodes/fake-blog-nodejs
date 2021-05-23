@@ -1,19 +1,18 @@
-const express = require('express');
-const cors = require('cors');
+import express, { json } from 'express'
+import cors from 'cors'
 
 // importing routes
 const postsRoutes = require('./routes/posts')
 
-// initialization
+// initialization 
 const app = express()
 
 // middlewares
-app.use(express.json())
+app.use(json())
 app.use(cors())
 app.options('*', cors())
 
 // routes
 app.use(postsRoutes)
 
-
-module.exports = app
+export default app

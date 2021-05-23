@@ -1,20 +1,22 @@
-const conn = require('../database/database')
+import { Post } from '../models/Post'
+import { Category } from '..//models/Category'
 
 const validateImage = (img) => (/\.(jpg|png|gif)$/i).test(img)
 
 //Get all elements
 exports.getAllPosts = async (req, res) => {
   try {
-
-    let query = `SELECT
-      posts.id, posts.title, posts.content, posts.image, posts.date, categories.description AS category
-      FROM posts INNER JOIN categories ON posts.category = categories.id;`
-
-    let response = await conn(query)
-
-    res.send({ "response": response });
-  }
-  catch (e) {
+    const allPosts = await Post.findAll({
+      include: [{
+        model: Category
+      }]
+    })
+    if (allPosts.length > 0) {
+      res.json({
+        data: allPosts
+      })
+    }
+  } catch (e) {
     console.error(e.message);
     res.status(413).send({ "Error": e.message });
   }
@@ -23,30 +25,35 @@ exports.getAllPosts = async (req, res) => {
 //Create a element
 exports.createPost = async (req, res) => {
   try {
-    if (!req.body.title || !req.body.content || !req.body.category) {
+    if (!req.body.title || !req.body.content || !req.body.categoryId) {
       throw new Error("Some data is missing");
     }
     if (!validateImage(req.body.image)) {
       throw new Error("Error on image format")
     }
 
+    const { title, content, categoryId, image } = req.body;
     const date = new Date()
-    const query = 'INSERT INTO blog_db.posts (title, content, image, category, date) VALUES (?, ?, ?, ?, ?)';
-    const response = await conn(query,
-      [req.body.title, req.body.content,
-      req.body.image, req.body.category, date]);
-
-    const result = {
-      ...req.body,
-      id: response.insertId,
-      date,
+    const newPost = await Post.create({
+      title,
+      content,
+      categoryId,
+      image,
+      date
+    }, {
+      fields: ['title', 'content', 'categoryId', 'image', 'date']
+    })
+    if (newPost) {
+      res.status(201).json({
+        message: "Post created successfully",
+        data: newPost
+      })
     }
 
-    res.status(201).send(result);
   }
   catch (e) {
     console.error(e.message);
-    res.status(413).send({ "Error": e.message });
+    res.status(400).json({ "Error": e.message });
   }
 }
 
@@ -57,51 +64,68 @@ exports.modifyPost = async (req, res) => {
     if (!req.params.id) {
       throw new Error("No id detected");
     }
-
-    let query = 'SELECT * FROM blog_db.posts WHERE id = ?';
-    let response = await conn(query, [req.params.id]);
-
-    if (response.length == 0) {
-      throw new Error("Id don't exist");
+    if (!validateImage(req.params.image)) {
+      throw new Error("Error on image format")
     }
 
-    query = 'UPDATE blog_db.posts SET title = ?, content = ?, image = ?, category = ? WHERE id = ?';
-    response = await conn(query, [req.body.title, req.body.content, req.body.image,
-    req.body.category, req.params.id]);
+    const { id } = req.params;
+    const { title, content, image, categoryId } = req.body;
 
-    res.send({ "response": response.affectedRows });
+    const posts = await Post.findAll({
+      attributes: ['id', 'title', 'content', 'image', 'categoryId'],
+      where: {
+        id
+      }
+    });
+
+    if (posts.length > 0) {
+      posts.forEach(async post => {
+        await post.update({
+          title,
+          content,
+          image,
+          categoryId
+        });
+      });
+    }
+
+    return res.json({
+      message: 'Post updated successfully',
+      data: posts
+    });
 
   }
   catch (e) {
-    console.error(e.message);
-    res.status(413).send({ "Error": e.message });
+    console.log(e);
+    res.status(500).json({
+      message: 'Something goes wrong',
+      data: {}
+    });
   }
 }
 
 //Get one element by id
-exports.getOne = async (req, res) => {
+exports.getPost = async (req, res) => {
   try {
     if (!req.params.id) {
       throw new Error("No id detected");
     }
 
-    const query = `SELECT
-      posts.id, posts.title, posts.content, posts.image, posts.date, categories.description AS category
-      FROM posts INNER JOIN categories ON posts.category = categories.id
-    WHERE posts.id = ?`;
-    const response = await conn(query, [req.params.id]);
-
-    if (response.length > 0) {
-      res.send({ "response": response });
-
-    } else {
-      res.status(404).send()
-    }
+    const { id } = req.params;
+    const post = await Post.findOne({
+      include: [{
+        model: Category,
+        where: { id }
+      }]
+    });
+    res.json({
+      data: post
+    });
 
   }
   catch (e) {
     console.error(e.message);
-    res.status(413).send({ "Error": e.message });
+    res.status(400).send({ "Error": e.message });
   }
 }
 
@@ -111,14 +135,16 @@ exports.deletePost = async (req, res) => {
     if (!req.params.id) {
       throw new Error("No id detected");
     }
-
-    let query = 'DELETE FROM blog_db.posts where id = ?'
-    await conn(query, [req.params.id]);
-
-    query = 'SELECT * FROM blog_db.posts ORDER BY id DESC LIMIT 10';
-    const response = await conn(query);
-
-    res.status(204).send(response);
+    const { id } = req.params;
+    const deleteRowCount = await Post.destroy({
+      where: {
+        id
+      }
+    });
+    res.status(204).json({
+      message: 'Project deleted successfully',
+      count: deleteRowCount
+    });
   }
   catch (e) {
     console.error(e.message);

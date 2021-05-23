@@ -4,15 +4,24 @@
   "description": "Backend challenge for Alkemy",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.js --exec babel-node",
+    "build": "babel src --out-dir dist",
+    "start": "node dist/index.js "
   },
   "author": "Brian Retamar",
   "license": "ISC",
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mysql": "^2.18.1",
-    "util": "^0.12.3"
+    "mysql2": "^2.2.5",
+    "regenerator-runtime": "^0.13.7",
+    "sequelize": "^6.6.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.14.3",
+    "@babel/core": "^7.14.3",
+    "@babel/node": "^7.14.2",
+    "@babel/preset-env": "^7.14.2"
   }
 }

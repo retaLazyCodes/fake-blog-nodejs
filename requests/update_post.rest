@@ -1,9 +1,9 @@
-PATCH  http://localhost:8081/api/posts/1
+PATCH  http://localhost:8081/api/posts/12
 Content-Type: application/json
 
 {
     "title": "Patch example",
-    "content": "Esto es un nuevo post editado",
-    "image": "asasddsa",
-    "category": "other"
+    "content": "Esto es un post editado",
+    "image": "https://cdn.pixabay.com/photo/2021/04/27/13/32/birds-6211541_960_720.png",
+    "categoryId": 6
 }
