@@ -7,4 +7,4 @@
 5. Now run `npm run build` to generate polyfill
 6. Finally run `npm start` to run the app
 
-*Note: in the 'request' you can see and test the endpoints of the api*
+*Note: in the 'requests' folder you can see and test the endpoints of the api*

@@ -115,8 +115,8 @@ exports.getPost = async (req, res) => {
     const post = await Post.findOne({
       include: [{
         model: Category,
-        where: { id }
-      }]
+      }],
+      where: { id: id }
     });
     res.json({
       data: post
