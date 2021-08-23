@@ -7,4 +7,5 @@
 5. Now run `npm run build` to generate polyfill
 6. Finally run `npm start` to run the app
 
-*Note: in the 'requests' folder you can see and test the endpoints of the api*
+**# Challenge:**
+Resolution of the next [challenge](https://drive.google.com/file/d/1bKQ8trGxMo8cY4J9qlNyi9iIo4LYDNnv/view?usp=sharing)
